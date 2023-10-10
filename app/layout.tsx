@@ -1,7 +1,8 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { NextUIProvider } from "@nextui-org/react";
+import { HoverCard } from './board/_components/hoverCard'
+import { SideNav } from './board/_components/sidenav'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -18,9 +19,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <NextUIProvider>
-          {children}
-        </NextUIProvider>
+        <main className='relative'>
+          <SideNav />
+          <div className='w-full pl-20'>
+            {children}
+          </div>
+        </main>
       </body>
     </html>
   )
