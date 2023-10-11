@@ -1,61 +1,201 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Account {
-  id                 String    @id @default(cuid())
-  userId             String
-  providerType       String
-  providerId         String
-  providerAccountId  String
-  refreshToken       String?
-  accessToken        String?
-  accessTokenExpires DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  user               User      @relation(fields: [userId], references: [id])
+generator client {
+  provider = "prisma-client-js"
+}
 
-  @@unique([providerId, providerAccountId])
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
 model Session {
   id           String   @id @default(cuid())
-  userId       String
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
   expires      DateTime
-  sessionToken String   @unique
-  accessToken  String   @unique
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         User     @relation(fields: [userId], references: [id])
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
+  id              String         @id @default(cuid())
+  name            String?
+  email           String?        @unique
+  emailVerified   DateTime?      @map("email_verified")
+  image           String?
+  password        String?
+  accounts        Account[]
+  sessions        Session[]
+  signup_date     DateTime       @default(now())
+  role            Role           @default(USER)
+  boards          Board[]
+  member_of_board BoardMember[]
+  member_of_card  CardMember[]
+  comments        Comment[]
+  card_activity   CardActivity[]
+
+  @@map("users")
 }
 
-model VerificationRequest {
-  id         String   @id @default(cuid())
+model VerificationToken {
   identifier String
   token      String   @unique
   expires    DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
 
   @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+model Board {
+  id            Int           @id @default(autoincrement())
+  User          User          @relation(fields: [owner_user_id], references: [id])
+  owner_user_id String
+  name          String
+  description   String?
+  lists         List[]
+  is_public     Boolean       @default(false)
+  created_date  DateTime      @default(now())
+  board_members BoardMember[]
+  labels        BoardLabel[]
+}
+
+// Many to Many Relationship
+model BoardMember {
+  User      User     @relation(fields: [user_id], references: [id])
+  user_id   String
+  Board     Board    @relation(fields: [board_id], references: [id])
+  board_id  Int
+  joined_at DateTime @default(now())
+
+  @@id([user_id, board_id])
+}
+
+model List {
+  id       Int    @id @default(autoincrement())
+  name     String
+  position Int
+  Board    Board  @relation(fields: [board_id], references: [id])
+  board_id Int
+  cards    Card[]
+}
+
+model Card {
+  id               Int               @id @default(autoincrement())
+  title            String
+  desc             String?
+  position         Int
+  created_date     DateTime          @default(now())
+  updated_at       DateTime?         @updatedAt
+  is_active        Boolean           @default(true)
+  due_date         DateTime
+  reminder_dates   DateTime[]
+  List             List              @relation(fields: [list_id], references: [id])
+  list_id          Int
+  card_members     CardMember[]
+  comments         Comment[]
+  checklist_items  ChecklistItem[]
+  card_attachments CardAttachments[]
+  activity         CardActivity[]
+  labels           CardLabel[]
+}
+
+model CardMember {
+  User      User     @relation(fields: [user_id], references: [id])
+  user_id   String
+  Card      Card     @relation(fields: [card_id], references: [id])
+  card_id   Int
+  joined_at DateTime @default(now())
+
+  @@id([user_id, card_id])
+}
+
+model Comment {
+  id         Int       @id @default(autoincrement())
+  comment    String
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+  Card       Card      @relation(fields: [card_id], references: [id])
+  card_id    Int
+  User       User      @relation(fields: [user_id], references: [id])
+  user_id    String
+}
+
+model ChecklistItem {
+  id         Int       @id @default(autoincrement())
+  name       String
+  is_checked Boolean   @default(false)
+  position   Int
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt
+  Card       Card      @relation(fields: [cardId], references: [id])
+  cardId     Int
+}
+
+model CardActivity {
+  id           Int      @id @default(autoincrement())
+  activity     String
+  created_date DateTime @default(now())
+  Card         Card     @relation(fields: [card_id], references: [id])
+  card_id      Int
+  User         User     @relation(fields: [user_id], references: [id])
+  user_id      String
+}
+
+model CardAttachments {
+  id          Int      @id @default(autoincrement())
+  uploaded_at DateTime @default(now())
+  filename    String
+  location    String
+  Card        Card?    @relation(fields: [cardId], references: [id])
+  cardId      Int?
+}
+
+// Labels
+model CoreLabel {
+  id    Int    @id @default(autoincrement())
+  name  String
+  color String
+}
+
+model BoardLabel {
+  id          Int         @id @default(autoincrement())
+  name        String
+  color       String
+  Board       Board       @relation(fields: [board_id], references: [id])
+  board_id    Int
+  card_labels CardLabel[]
+}
+
+model CardLabel {
+  Card          Card       @relation(fields: [card_id], references: [id])
+  card_id       Int
+  BoardLabel    BoardLabel @relation(fields: [boardLabel_id], references: [id])
+  boardLabel_id Int
+
+  @@id([card_id, boardLabel_id])
+}
+
+enum Role {
+  USER
+  ADMIN
 }
