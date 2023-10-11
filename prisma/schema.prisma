@@ -43,7 +43,7 @@ model User {
   email           String?        @unique
   emailVerified   DateTime?      @map("email_verified")
   image           String?
-  password        String?
+  links           Link[]
   accounts        Account[]
   sessions        Session[]
   signup_date     DateTime       @default(now())
@@ -53,6 +53,7 @@ model User {
   member_of_card  CardMember[]
   comments        Comment[]
   card_activity   CardActivity[]
+  UserRole        UserRole[]
 
   @@map("users")
 }
@@ -66,17 +67,49 @@ model VerificationToken {
   @@map("verificationtokens")
 }
 
+model Organization {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  links       Link[]
+  boards      Board[]
+  UserRole    UserRole[]
+}
+
+model Link {
+  id             Int           @id @default(autoincrement())
+  name           String
+  url            String
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId Int?
+  User           User?         @relation(fields: [userId], references: [id])
+  userId         String?
+}
+
+model UserRole {
+  User         User         @relation(fields: [user_id], references: [id])
+  user_id      String
+  Organization Organization @relation(fields: [org_id], references: [id])
+  org_id       Int
+  joined_at    DateTime     @default(now())
+  role         String       @default("Member")
+
+  @@id([user_id, org_id])
+}
+
 model Board {
-  id            Int           @id @default(autoincrement())
-  User          User          @relation(fields: [owner_user_id], references: [id])
-  owner_user_id String
-  name          String
-  description   String?
-  lists         List[]
-  is_public     Boolean       @default(false)
-  created_date  DateTime      @default(now())
-  board_members BoardMember[]
-  labels        BoardLabel[]
+  id             Int           @id @default(autoincrement())
+  User           User          @relation(fields: [owner_user_id], references: [id])
+  owner_user_id  String
+  name           String
+  description    String?
+  lists          List[]
+  is_public      Boolean       @default(false)
+  created_date   DateTime      @default(now())
+  board_members  BoardMember[]
+  labels         BoardLabel[]
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId Int?
 }
 
 // Many to Many Relationship
