@@ -4,5 +4,7 @@ export {
     Reply,
     Bell,
     Wand2,
-    ChevronRight
+    ChevronRight,
+    LayoutDashboard,
+    Search
 } from 'lucide-react';
