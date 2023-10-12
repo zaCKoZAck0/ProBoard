@@ -22,7 +22,7 @@
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
 
-    --primary: 211 61% 48%;
+    --primary: 281.06 83.72% 65.10%;
     --primary-foreground: 0 0% 98%;
 
     --secondary: 240 4.8% 95.9%;
@@ -122,4 +122,8 @@ main {
 
 a {
   @apply focus:outline-none focus-visible:ring-2;
+}
+
+.big-btn{
+  @apply w-full my-2 h-14 rounded-full gap-2 text-sm font-bold border;
 }
