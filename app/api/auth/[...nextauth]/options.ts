@@ -16,20 +16,20 @@ const prisma = new PrismaClient();
 export const options: NextAuthOptions = {
     adapter: PrismaAdapter(prisma) as Adapter,
     providers: [
-        // GoogleProvider({
-        //     profile(profile: GoogleProfile) {
-        //         console.log(profile)
-        //         return {
-        //             role: profile.role ?? "USER",
-        //             id: profile.sub,
-        //             name: profile.name,
-        //             email: profile.email,
-        //             image: profile.picture,
-        //         }
-        //     },
-        //     clientId: process.env.GOOGLE_CLIENT_ID as string,
-        //     clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
-        // }),
+        GoogleProvider({
+            profile(profile: GoogleProfile) {
+                console.log(profile)
+                return {
+                    role: profile.role ?? "USER",
+                    id: profile.sub,
+                    name: profile.name,
+                    email: profile.email,
+                    image: profile.picture,
+                }
+            },
+            clientId: process.env.GOOGLE_CLIENT_ID as string,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
+        }),
         GitHubProvider({
             profile(profile: GithubProfile) {
                 console.log(profile);
