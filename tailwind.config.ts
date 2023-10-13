@@ -1,7 +1,7 @@
 const { fontFamily } =
   // eslint-disable-next-line
   require('tailwindcss/defaultTheme') as typeof import('tailwindcss/defaultTheme');
-
+const {nextui} = require("@nextui-org/react");
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
@@ -9,6 +9,7 @@ module.exports = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     'src/**/*.{ts,tsx}',
     '../../packages/{ui,monaco}/**/*.{ts,tsx}',
+    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -103,5 +104,6 @@ module.exports = {
     require('tailwindcss-animate'),
     require('@tailwindcss/typography'),
     require('@tailwindcss/container-queries'),
+    nextui()
   ],
 };
