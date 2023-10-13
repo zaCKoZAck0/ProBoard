@@ -60,7 +60,7 @@ export default function LoginPage(){
           <FormLabel className='text-neutral-500'>Continue with Email</FormLabel>
           <div className="flex w-full max-w-sm items-center space-x-2">
             <FormControl>
-      <Input type="email" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="Email" />
+      <Input type="email" value={field.value} onChange={field.onChange} placeholder="Email" />
       </FormControl>
       <Button className="transition-all duration-300" variant='default' type="submit"><MailIcon /></Button>
     </div>

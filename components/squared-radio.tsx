@@ -1,11 +1,10 @@
 "use client"
 import React from "react";
-import { RadioGroup, Radio, useRadio, VisuallyHidden, cn } from "@nextui-org/react";
+import { RadioGroup, Radio, useRadio, VisuallyHidden, cn, AvatarGroup } from "@nextui-org/react";
 import {CheckCircle} from '@/lib/icons'
 import type { RadioProps } from "@nextui-org/react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-export const CustomRadio = (props : RadioProps) => {
+export const SquaredRadio = (props : RadioProps) => {
   const {
     Component,
     children,
@@ -44,16 +43,3 @@ export const CustomRadio = (props : RadioProps) => {
     </Component>
   );
 };
-
-export default function App() {
-  return (
-    <RadioGroup label="Select your work type">
-      <CustomRadio description="Create Organization" value="org">
-        <span className="font-semibold text-lg">I have a team</span>
-      </CustomRadio>
-      <CustomRadio description="You can still create or join Organization(s) later." value="solo">
-        <span className="font-semibold text-lg">I work solo</span>
-      </CustomRadio>
-    </RadioGroup>
-  );
-}

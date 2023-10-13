@@ -12,5 +12,7 @@ export {
     SendHorizonal,
     Mail,
     ArrowRightCircle as Next,
-    ArrowLeftCircle as Previous
+    ArrowLeftCircle as Previous,
+    Image,
+    ImagePlus
 } from 'lucide-react';
